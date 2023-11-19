@@ -27,45 +27,45 @@ def count_products(data):
 
 
 def clean_data(dataframe):
-    dataframe = pd.DataFrame(dataframe, columns=['modelID', 'title', 'shop', 'brand'])
+    clean_dataframe = pd.DataFrame(dataframe, columns=['modelID', 'title', 'shop', 'brand'])
 
-    # need to remove capital  letters, interpunction etc from title, herz=hz, inch, remove store name, remove weird notation
-    dataframe['title'] = dataframe['title'].str.lower()     # remove capital letters
-    dataframe['title'] = dataframe['title'].str.replace("-", "")
-    dataframe['title'] = dataframe['title'].str.replace("/", "")
-    dataframe['title'] = dataframe['title'].str.replace("(", "")
-    dataframe['title'] = dataframe['title'].str.replace(")", "")
-    dataframe['title'] = dataframe['title'].str.replace("[", "")
-    dataframe['title'] = dataframe['title'].str.replace("]", "")
-    dataframe['title'] = dataframe['title'].str.replace("|", "")
-    dataframe['title'] = dataframe['title'].str.replace("+", "")
-    dataframe['title'] = dataframe['title'].str.replace(":", "")
-    dataframe['title'] = dataframe['title'].str.replace("  ", " ")
+    unique_brands = []
+    for i in range(len(clean_dataframe)):
+        if clean_dataframe['brand'][i] not in unique_brands and clean_dataframe['brand'][i] is not None:
+            unique_brands.append(clean_dataframe['brand'][i])
 
-    dataframe['title'] = dataframe['title'].str.replace("inches", "inch")
-    dataframe['title'] = dataframe['title'].str.replace("\"", "inch")
-    dataframe['title'] = dataframe['title'].str.replace(" inch", "inch")
-    dataframe['title'] = dataframe['title'].str.replace("'", "inch")
-    dataframe['title'] = dataframe['title'].str.replace("''", "inch")
+    for i in range(len(clean_dataframe)):
+        if clean_dataframe['brand'][i] is None:
+            brand_name = list(filter(lambda brand: brand in clean_dataframe['title'][i], unique_brands))
+            if brand_name:
+                clean_dataframe['brand'][i] = brand_name[0]
 
-    dataframe['title'] = dataframe['title'].str.replace("hertz", "hz")
-    dataframe['title'] = dataframe['title'].str.replace(" hz", "hz")
+    inch_list = ["inches", "\"", " inch", "'", "''", "”"]
+    hertz_list = ["hertz", " hz"]
+    site_list = ["amazon.com", "bestbuy.com", "best buy", "newegg.com", "thenerds.net"]
 
-    dataframe['title'] = dataframe['title'].str.replace("amazon.com", "")
-    dataframe['title'] = dataframe['title'].str.replace("bestbuy.com", "")
-    dataframe['title'] = dataframe['title'].str.replace("best buy", "")
-    dataframe['title'] = dataframe['title'].str.replace("newegg.com", "")
-    dataframe['title'] = dataframe['title'].str.replace("thenerds.net", "")
+    clean_dataframe['title'] = clean_dataframe['title'].str.lower()     # remove capital letters
+    for i in range(len(clean_dataframe)):
+        clean_dataframe['title'][i] = re.sub("[^a-zA-Z0-9\s\.]", "", clean_dataframe['title'][i])
 
-    dataframe['title'] = dataframe['title'].str.strip()
+        for inch in inch_list:
+            clean_dataframe['title'][i] = clean_dataframe['title'][i].replace(inch, "inch")
 
-    dataframe['brand'] = dataframe['brand'].str.lower()     # remove capital letters
-    dataframe['shop'] = dataframe['shop'].str.lower()   # remove capital letters
-    return dataframe
+        for hertz in hertz_list:
+            clean_dataframe['title'][i] = clean_dataframe['title'][i].replace(hertz, "hz")
+
+        for site in site_list:
+            clean_dataframe['title'][i] = clean_dataframe['title'][i].replace(site, "")
+
+    clean_dataframe['title'] = clean_dataframe['title'].str.strip()
+
+    clean_dataframe['brand'] = clean_dataframe['brand'].str.lower()     # remove capital letters
+    clean_dataframe['shop'] = clean_dataframe['shop'].str.lower()   # remove capital letters
+    return clean_dataframe
 
 
 def find_modelword(title):
-    regex = re.compile(r'(\b(?:[0-9]*)[a-z]+\b)|(\b[a-z]+\b)')
+    regex = re.compile(r'(?:^|(?<=[ \[\(]))([a-zA-Z0-9]*(?:(?:[0-9]+[^0-9\., ()]+)|(?:[^0-9\., ()]+[0-9]+)|(?:([0-9]+\.[0-9]+)[^0-9\., ()]+))[a-zA-Z0-9]*)(?:$|(?=[ \)\]]))')
     modelword = [x for sublist in regex.findall(title) for x in sublist if x != ""]
     return modelword
 
@@ -81,7 +81,8 @@ def get_k_shingle(text, k):
 if __name__ == "__main__":
     data, dataframe = get_data()
     print(dataframe)
-    clean_data(dataframe)
+    clean_dataframe = clean_data(dataframe)
+    print(clean_dataframe)
     # print(data)
     # print(len(data))
     print(count_products(data))
