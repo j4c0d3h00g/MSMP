@@ -1,4 +1,4 @@
-from data_preprocessing import find_modelword, get_k_shingle, get_data, clean_data
+from data_preprocessing import find_modelword, get_k_shingle, get_data, clean_data, possible_values_br, jaccard_similarity
 import numpy as np
 import pandas as pd
 import math
@@ -71,6 +71,25 @@ def locality_sensitive_hashing(signature_matrix, b, r):
     potential_pairs_set = set(potential_pairs)
 
     return potential_pairs_set
+
+
+def create_dissimilarity_matrix(dataframe, potential_pairs, k):
+    n_products = len(dataframe)
+    dissimilarity_matrix = np.full((n_products, n_products), 100, float)
+    np.fill_diagonal(dissimilarity_matrix, 0)
+
+    for pair in potential_pairs:
+        product1 = potential_pairs[0]
+        product2 = potential_pairs[1]
+
+        shingle1 = get_k_shingle(dataframe['title'][product1], k)
+        shingle2 = get_k_shingle(dataframe['title'][product2], k)
+
+        dissimilarity_matrix[product1, product2] = 1 - jaccard_similarity(set(shingle1), set(shingle2))
+
+
+
+
 
 
 if __name__ == "__main__":

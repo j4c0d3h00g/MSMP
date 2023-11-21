@@ -92,6 +92,11 @@ def possible_values_br(signature_matrix):
     return bands, rows
 
 
+def jaccard_similarity(shingle1, shingle2):
+    similarity = len(shingle1.intersection(shingle2)) / len(shingle1.union(shingle2))
+    return similarity
+
+
 if __name__ == "__main__":
     data, dataframe = get_data()
     print(dataframe)
