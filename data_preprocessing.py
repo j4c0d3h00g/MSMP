@@ -78,6 +78,20 @@ def get_k_shingle(text, k):
     return shingles
 
 
+def possible_values_br(signature_matrix):
+    n, _ = signature_matrix.shape
+    bands = []
+    rows = []
+
+    for b in range(1, n + 1):
+        for r in range(1, n + 1):
+            if b * r == n:
+                bands.append(b)
+                rows.append(r)
+
+    return bands, rows
+
+
 if __name__ == "__main__":
     data, dataframe = get_data()
     print(dataframe)
