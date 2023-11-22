@@ -1,11 +1,10 @@
-from data_preprocessing import find_modelword, get_k_shingle, get_data, clean_data, possible_values_br, jaccard_similarity
+from data_preprocessing import find_modelword, get_k_shingles, get_data, clean_data, possible_values_br, jaccard_similarity
 import numpy as np
 import pandas as pd
 import math
 import collections
 import itertools
-import random
-
+from sklearn.cluster import AgglomerativeClustering
 
 
 def create_binary_vector_representations(dataframe):
@@ -17,7 +16,7 @@ def create_binary_vector_representations(dataframe):
     for i in range(n_cols):
         all_modelwords.append(find_modelword(dataframe['title'][i]))    # Nested list where list i contains the modelwords of product i
     for i in range(len(all_modelwords)):
-        words = get_k_shingle(all_modelwords[i], 1)
+        words = get_k_shingles(all_modelwords[i], 1)
         for word in words:
             if word not in all_unique_words:
                 all_unique_words.append(word)
@@ -79,17 +78,45 @@ def create_dissimilarity_matrix(dataframe, potential_pairs, k):
     np.fill_diagonal(dissimilarity_matrix, 0)
 
     for pair in potential_pairs:
-        product1 = potential_pairs[0]
-        product2 = potential_pairs[1]
+        product1 = pair[0]
+        product2 = pair[1]
 
-        shingle1 = get_k_shingle(dataframe['title'][product1], k)
-        shingle2 = get_k_shingle(dataframe['title'][product2], k)
+        shingles1 = get_k_shingles(dataframe['title'][product1], k)
+        shingles2 = get_k_shingles(dataframe['title'][product2], k)
 
-        dissimilarity_matrix[product1, product2] = 1 - jaccard_similarity(set(shingle1), set(shingle2))
+        dissimilarity_matrix[product1, product2] = 1 - jaccard_similarity(set(shingles1), set(shingles2))
+
+        if dataframe['shop'][product1] == dataframe['shop'][product2]:
+            dissimilarity_matrix[product1, product2] = 100
+
+        if dataframe['brand'][product1] is not None and dataframe['brand'][product2] is not None and dataframe['brand'][product1] != dataframe['brand'][product2]:
+            dissimilarity_matrix[product1, product2] = 100
+
+        dissimilarity_matrix[product2, product1] = dissimilarity_matrix[product1, product2]
+
+        return dissimilarity_matrix
 
 
+def clustering(dissimilarity_matrix, threshold):
+    linkage_clustering = AgglomerativeClustering(n_clusters=None, metric="precomputed", linkage="average", distance_threshold=threshold)
+    clusters = linkage_clustering.fit_predict(dissimilarity_matrix)
 
+    n_clusters = len(clusters)
+    cluster_dict = collections.defaultdict(set)
+    potential_pairs = set()
 
+    for index in range(n_clusters):
+        cluster_dict[clusters[index]].add(index)
+
+    for potential_pair in cluster_dict.values():
+        if len(potential_pair) > 1:
+            for pair in itertools.combinations(potential_pair, 2):
+                potential_pairs.append(pair)
+
+    potential_pairs = [element for element in potential_pairs if element[0] < element[1]]
+    potential_pairs_set = set(potential_pairs)
+
+    return potential_pairs_set
 
 
 if __name__ == "__main__":
@@ -97,7 +124,9 @@ if __name__ == "__main__":
     dataframe = clean_data(dataframe)
     binary_vector_representations = create_binary_vector_representations(dataframe)
     signature_matrix = min_hashing(0.5, binary_vector_representations)
-    pairs = locality_sensitive_hashing(signature_matrix, 94, 6)
+    pairs_lsh = locality_sensitive_hashing(signature_matrix, 1, 564)
+    dissimilarity_matrix = create_dissimilarity_matrix(dataframe, pairs_lsh, 4)
+    pairs_clustering = clustering(dissimilarity_matrix, 1/20)
 
 
 

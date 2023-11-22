@@ -19,7 +19,6 @@ def get_data():
 
 def count_products(data):
     number_of_products = 0
-
     for key in data.keys():
         number_of_products += len(data[key])
 
@@ -70,7 +69,7 @@ def find_modelword(title):
     return modelword
 
 
-def get_k_shingle(text, k):
+def get_k_shingles(text, k):
     shingles = []
     for i in range(0, len(text) - k + 1):
         shingles.append(text[i:i+k])
@@ -95,6 +94,17 @@ def possible_values_br(signature_matrix):
 def jaccard_similarity(shingle1, shingle2):
     similarity = len(shingle1.intersection(shingle2)) / len(shingle1.union(shingle2))
     return similarity
+
+def count_duplicates(dataframe):
+    number_of_duplicates = 0
+
+    for i in range(len(dataframe)):
+        for j in range(i + 1, len(dataframe)):
+            if dataframe['modelID'][i] == dataframe['modelID'][j]:
+                number_of_duplicates += 1
+
+    return number_of_duplicates
+
 
 
 if __name__ == "__main__":
