@@ -84,7 +84,10 @@ def create_dissimilarity_matrix(dataframe, potential_pairs, k):
         shingles1 = get_k_shingles(dataframe['title'][product1], k)
         shingles2 = get_k_shingles(dataframe['title'][product2], k)
 
-        dissimilarity_matrix[product1, product2] = 1 - jaccard_similarity(set(shingles1), set(shingles2))
+        set_shingles1 = set(shingles1)
+        set_shingles2 = set(shingles2)
+        similarity = jaccard_similarity(set_shingles1, set_shingles2)
+        dissimilarity_matrix[product1, product2] = 1 - similarity
 
         if dataframe['shop'][product1] == dataframe['shop'][product2]:
             dissimilarity_matrix[product1, product2] = 100
@@ -94,7 +97,7 @@ def create_dissimilarity_matrix(dataframe, potential_pairs, k):
 
         dissimilarity_matrix[product2, product1] = dissimilarity_matrix[product1, product2]
 
-        return dissimilarity_matrix
+    return dissimilarity_matrix
 
 
 def clustering(dissimilarity_matrix, threshold):
@@ -103,7 +106,7 @@ def clustering(dissimilarity_matrix, threshold):
 
     n_clusters = len(clusters)
     cluster_dict = collections.defaultdict(set)
-    potential_pairs = set()
+    potential_pairs = []
 
     for index in range(n_clusters):
         cluster_dict[clusters[index]].add(index)
@@ -126,7 +129,10 @@ if __name__ == "__main__":
     signature_matrix = min_hashing(0.5, binary_vector_representations)
     pairs_lsh = locality_sensitive_hashing(signature_matrix, 1, 564)
     dissimilarity_matrix = create_dissimilarity_matrix(dataframe, pairs_lsh, 4)
-    pairs_clustering = clustering(dissimilarity_matrix, 1/20)
+    pairs_clustering = clustering(dissimilarity_matrix, 1)
+
+    print(dissimilarity_matrix)
+    print(pairs_clustering)
 
 
 

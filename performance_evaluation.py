@@ -12,7 +12,6 @@ def evaluate_performance(potential_pairs, dataframe):
         if dataframe['modelID'][product1] == dataframe['modelID'][product2]:
             duplicates_found += 1
 
-
     number_of_duplicates = count_duplicates(dataframe)
     number_of_comparisons = len(potential_pairs) + 0.000001
     pair_quality = duplicates_found / number_of_comparisons
@@ -25,6 +24,22 @@ def evaluate_performance(potential_pairs, dataframe):
     fraction_of_comparisons = number_of_comparisons / number_of_possible_comparisons
 
     return pair_quality, pair_completeness, f1, fraction_of_comparisons
+
+
+def optimal_threshold(dissimilarity_matrix, dataframe):
+    optimal_f1 = 0
+    optimal_threshold = 0
+
+    for i in range(21):
+        threshold = i / 20
+        pairs = clustering(dissimilarity_matrix, threshold)
+        _, _, f1, _ = evaluate_performance(pairs, dataframe)
+
+        if f1 > optimal_f1:
+            optimal_threshold = threshold
+            optimal_f1 = f1
+
+    return optimal_threshold
 
 
 if __name__ == "__main__":
@@ -45,7 +60,8 @@ if __name__ == "__main__":
         print('Fraction of comparisons:', fraction_of_comparisons_lsh)
 
         dissimilarity_matrix = create_dissimilarity_matrix(dataframe, pairs_lsh, 4)
-        pairs_clustering = clustering(dissimilarity_matrix, 0.05)
+        threshold = optimal_threshold(dissimilarity_matrix, dataframe)
+        pairs_clustering = clustering(dissimilarity_matrix, threshold)
         pair_quality_clustering, pair_completeness_clustering, f1, fraction_of_comparisons_clustering = evaluate_performance(pairs_clustering, dataframe)
 
         print('b:', bands[i], 'r:', rows[i])
