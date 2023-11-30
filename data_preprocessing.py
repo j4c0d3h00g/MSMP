@@ -63,9 +63,9 @@ def clean_data(dataframe):
     return clean_dataframe
 
 
-def find_modelword(title):
+def find_modelword_title(expression):
     regex = re.compile(r'(?:^|(?<=[ \[\(]))([a-zA-Z0-9]*(?:(?:[0-9]+[^0-9\., ()]+)|(?:[^0-9\., ()]+[0-9]+)|(?:([0-9]+\.[0-9]+)[^0-9\., ()]+))[a-zA-Z0-9]*)(?:$|(?=[ \)\]]))')
-    modelword = [x for sublist in regex.findall(title) for x in sublist if x != ""]
+    modelword = [x for sublist in regex.findall(expression) for x in sublist if x != ""]
     return modelword
 
 
@@ -109,10 +109,10 @@ def count_duplicates(dataframe):
 
 if __name__ == "__main__":
     data, dataframe = get_data()
-    print(dataframe)
+    # print(dataframe)
     clean_dataframe = clean_data(dataframe)
     print(count_duplicates(clean_dataframe))
-    print(clean_dataframe)
+    # print(clean_dataframe)
     # print(data)
     # print(len(data))
     print(count_products(data))

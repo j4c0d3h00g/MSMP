@@ -1,10 +1,12 @@
-from data_preprocessing import find_modelword, get_k_shingles, get_data, clean_data, possible_values_br, jaccard_similarity
+from data_preprocessing import find_modelword_title, get_k_shingles, get_data, clean_data, possible_values_br, jaccard_similarity
 import numpy as np
 import pandas as pd
 import math
 import collections
 import itertools
 from sklearn.cluster import AgglomerativeClustering
+from random import randint
+from sympy import randprime
 
 
 def create_binary_vector_representations(dataframe):
@@ -14,7 +16,8 @@ def create_binary_vector_representations(dataframe):
 
     # to-do: modelwords in key-value pairs
     for i in range(n_cols):
-        all_modelwords.append(find_modelword(dataframe['title'][i]))    # Nested list where list i contains the modelwords of product i
+        all_modelwords.append(find_modelword_title(dataframe['title'][i]))    # Nested list where list i contains the modelwords of product i
+
     for i in range(len(all_modelwords)):
         words = get_k_shingles(all_modelwords[i], 1)
         for word in words:
@@ -32,17 +35,28 @@ def create_binary_vector_representations(dataframe):
 
 def min_hashing(multiplication_factor, binary_vector_representations):
     n_modelwords, n_products = binary_vector_representations.shape
-    binary_vector_representations_frame = pd.DataFrame(binary_vector_representations, columns=np.arange(n_products))
+    # binary_vector_representations_frame = pd.DataFrame(binary_vector_representations, columns=np.arange(n_products))
     k = math.ceil(multiplication_factor * n_modelwords)
 
-    signature_matrix = np.zeros((k, n_products))
-    for i in range(k):
-        binary_vector_representations_frame_permuted = binary_vector_representations_frame.sample(frac=1)
+    signature_matrix = np.full((k, n_products), np.inf)
 
-        for j in range(n_products):
-            column = binary_vector_representations_frame_permuted.iloc[:, j]
-            row_index = (column.values == 1).argmax()
-            signature_matrix[i, j] = row_index
+    a = np.zeros(k)
+    b = np.zeros(k)
+    p = np.zeros(k)
+    for i in range(k):
+        a[i] = randint(1, n_modelwords)
+        b[i] = randint(1, n_modelwords)
+        p[i] = randprime(k + 1, (3 * (k + 1)) + 1)
+
+    random_hash_functions = np.zeros(k)
+    for row in range(n_modelwords):
+        for i in range(k):
+            random_hash_functions[i] = (a[i] + b[i] * row) % p[i]
+
+        for column in range(n_products):
+            if binary_vector_representations[row, column] == 1:
+                minimum_values = np.minimum(signature_matrix[:, column], random_hash_functions)
+                signature_matrix[:, column] = minimum_values
 
     return signature_matrix
 
