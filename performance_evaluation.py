@@ -1,4 +1,4 @@
-from functions import create_binary_vector_representations, min_hashing, locality_sensitive_hashing, create_dissimilarity_matrix, clustering
+from functions import *
 from data_preprocessing import get_data, clean_data, count_duplicates, possible_values_br
 
 
@@ -43,9 +43,10 @@ def optimal_threshold(dissimilarity_matrix, dataframe):
 
 
 if __name__ == "__main__":
-    _, dataframe = get_data()
-    dataframe = clean_data(dataframe)
-    binary_vector_representations = create_binary_vector_representations(dataframe)
+    data, dataframe = get_data()
+    most_frequent_keys, keyvalues_dataframe = find_most_common_keyvalues(data, 0)
+    dataframe = clean_data(dataframe, keyvalues_dataframe, most_frequent_keys)
+    binary_vector_representations = create_binary_vector_representations(dataframe, True, most_frequent_keys)
     signature_matrix = min_hashing(0.5, binary_vector_representations)
     bands, rows = possible_values_br(signature_matrix)
 
@@ -59,7 +60,7 @@ if __name__ == "__main__":
         print('F1_star:', f1_star)
         print('Fraction of comparisons:', fraction_of_comparisons_lsh)
 
-        dissimilarity_matrix = create_dissimilarity_matrix(dataframe, pairs_lsh, 4)
+        dissimilarity_matrix = create_dissimilarity_matrix(dataframe, pairs_lsh, 4, most_frequent_keys)
         threshold = optimal_threshold(dissimilarity_matrix, dataframe)
         pairs_clustering = clustering(dissimilarity_matrix, threshold)
         pair_quality_clustering, pair_completeness_clustering, f1, fraction_of_comparisons_clustering = evaluate_performance(pairs_clustering, dataframe)
