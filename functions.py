@@ -9,7 +9,6 @@ from random import randint
 from sympy import randprime
 
 
-
 def create_binary_vector_representations(dataframe, most_frequent_keys):
     n_cols = len(dataframe)
     all_modelwords_title = []
