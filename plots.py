@@ -1,0 +1,68 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+result_bootstrap1_keys0 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap1_keys0.xlsx')
+result_bootstrap2_keys0 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap2_keys0.xlsx')
+result_bootstrap3_keys0 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap3_keys0.xlsx')
+result_bootstrap4_keys0 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap4_keys0.xlsx')
+result_bootstrap5_keys0 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap5_keys0.xlsx')
+
+result_bootstrap1_keys4 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap1_keys4.xlsx')
+result_bootstrap2_keys4 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap2_keys4.xlsx')
+result_bootstrap3_keys4 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap3_keys4.xlsx')
+result_bootstrap4_keys4 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap4_keys4.xlsx')
+result_bootstrap5_keys4 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap5_keys4.xlsx')
+
+result_bootstrap1_keys8 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap1_keys8.xlsx')
+result_bootstrap2_keys8 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap2_keys8.xlsx')
+result_bootstrap3_keys8 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap3_keys8.xlsx')
+result_bootstrap4_keys8 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap4_keys8.xlsx')
+result_bootstrap5_keys8 = pd.read_excel('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Results\\result_bootstrapping_bootstrap5_keys8.xlsx')
+
+combined_result_keys0 = pd.concat((result_bootstrap1_keys0, result_bootstrap2_keys0, result_bootstrap3_keys0, result_bootstrap4_keys0, result_bootstrap5_keys0))
+column_value_keys0 = combined_result_keys0.groupby(combined_result_keys0.index)
+average_keys0 = column_value_keys0.mean()
+
+combined_result_keys4 = pd.concat((result_bootstrap1_keys4, result_bootstrap2_keys4, result_bootstrap3_keys4, result_bootstrap4_keys4, result_bootstrap5_keys4))
+column_value_keys4 = combined_result_keys4.groupby(combined_result_keys4.index)
+average_keys4 = column_value_keys4.mean()
+
+combined_result_keys8 = pd.concat((result_bootstrap1_keys8, result_bootstrap2_keys8, result_bootstrap3_keys8, result_bootstrap4_keys8, result_bootstrap5_keys8))
+column_value_keys8 = combined_result_keys8.groupby(combined_result_keys8.index)
+average_keys8 = column_value_keys8.mean()
+
+plt.plot(average_keys0['Fraction comparisons LSH'], average_keys0['PC LSH'], label="MSMP+ (keys = 0)")
+plt.plot(average_keys4['Fraction comparisons LSH'], average_keys4['PC LSH'], label="MSMP+ (keys = 4)")
+plt.plot(average_keys8['Fraction comparisons LSH'], average_keys8['PC LSH'], label="MSMP+ (keys = 8)")
+plt.ylabel("Pair completeness")
+plt.xlabel("Fraction of comparisons")
+plt.legend()
+plt.show()
+plt.savefig('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Graphs\\pc', format="svg")
+
+plt.plot(average_keys0['Fraction comparisons LSH'], average_keys0['PQ LSH'], label="MSMP+ (keys = 0)")
+plt.plot(average_keys4['Fraction comparisons LSH'], average_keys4['PQ LSH'], label="MSMP+ (keys = 4)")
+plt.plot(average_keys8['Fraction comparisons LSH'], average_keys8['PQ LSH'], label="MSMP+ (keys = 8)")
+plt.ylabel("Pair quality")
+plt.xlabel("Fraction of comparisons")
+plt.legend()
+plt.show()
+plt.savefig('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Graphs\\pq', format="svg")
+
+plt.plot(average_keys0['Fraction comparisons LSH'], average_keys0['F1-star'], label="MSMP+ (keys = 0)")
+plt.plot(average_keys4['Fraction comparisons LSH'], average_keys4['F1-star'], label="MSMP+ (keys = 4)")
+plt.plot(average_keys8['Fraction comparisons LSH'], average_keys8['F1-star'], label="MSMP+ (keys = 8)")
+plt.ylabel("F1-measure")
+plt.xlabel("Fraction of comparisons")
+plt.legend()
+plt.show()
+plt.savefig('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Graphs\\f1star', format="svg")
+
+plt.plot(average_keys0['Fraction comparisons LSH'], average_keys0['F1'], label="MSMP+ (keys = 0)")
+plt.plot(average_keys4['Fraction comparisons LSH'], average_keys4['F1'], label="MSMP+ (keys = 4)")
+plt.plot(average_keys8['Fraction comparisons LSH'], average_keys8['F1'], label="MSMP+ (keys = 8)")
+plt.ylabel("F1-measure")
+plt.xlabel("Fraction of comparisons")
+plt.legend()
+plt.show()
+plt.savefig('C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\python\\Duplicate Detection\\Duplicate-Detection\\Graphs\\f1', format="svg")

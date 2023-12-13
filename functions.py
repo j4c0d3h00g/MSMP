@@ -1,36 +1,36 @@
 from data_preprocessing import *
+import collections
+import itertools
 import numpy as np
 import pandas as pd
 pd.options.mode.chained_assignment = None
-import math
-import collections
-import itertools
 from sklearn.cluster import AgglomerativeClustering
 from random import randint
-from sympy import randprime, nextprime
-import itertools
+from sympy import randprime
 
 
-def create_binary_vector_representations(dataframe, title_boolean, most_frequent_keys):
+
+def create_binary_vector_representations(dataframe, most_frequent_keys):
     n_cols = len(dataframe)
     all_modelwords_title = []
     all_modelwords_keyvalues = []
     all_unique_words = []
 
     for i in range(n_cols):
-        all_modelwords_title.append(find_modelwords_title(dataframe['title'][i]))    # Nested list where list i contains the modelwords of product i
+        all_modelwords_title.append(find_modelwords_title(dataframe['title'][i]))       # Find model words in title.
 
     for i in range(n_cols):
         modelwords_keyvaluepairs = []
         for j in range(len(most_frequent_keys)):
             if dataframe[most_frequent_keys[j]][i] is not None:
-                modelwords = find_modelwords_keyvaluepairs(dataframe[most_frequent_keys[j]][i])
+                modelwords = find_modelwords_keyvaluepairs(dataframe[most_frequent_keys[j]][i])     # Find model words in key-value pairs.
                 modelwords_keyvaluepairs = list(itertools.chain(modelwords_keyvaluepairs, modelwords))
 
         all_modelwords_keyvalues.append(modelwords_keyvaluepairs)
 
-    all_modelwords = list(itertools.chain(all_modelwords_title, all_modelwords_keyvalues))
+    all_modelwords = list(itertools.chain(all_modelwords_title, all_modelwords_keyvalues))      # Create a list containing all model words.
 
+    # Find all unique model words in the list containing all model words.
     for i in range(len(all_modelwords)):
         words = get_k_shingles(all_modelwords[i], 1)
         for word in words:
@@ -47,9 +47,9 @@ def create_binary_vector_representations(dataframe, title_boolean, most_frequent
     return binary_vector_representations
 
 
-def min_hashing(multiplication_factor, binary_vector_representations):
+def min_hashing(signature_size, binary_vector_representations):
     n_modelwords, n_products = binary_vector_representations.shape
-    k = math.ceil(multiplication_factor * n_modelwords)
+    k = signature_size
 
     signature_matrix = np.full((k, n_products), np.inf)
 
@@ -57,12 +57,9 @@ def min_hashing(multiplication_factor, binary_vector_representations):
     b = np.zeros(k)
     p = np.zeros(k)
     for i in range(k):
-        # a[i] = randint(1, n_modelwords)
-        # b[i] = randint(1, n_modelwords)
-        # p[i] = randprime(k + 1, (3 * (k + 1)) + 1)
-        a[i] = randint(1, 100)
-        b[i] = randint(1, 100)
-        p[i] = nextprime(k)
+        a[i] = randint(1, n_modelwords)
+        b[i] = randint(1, n_modelwords)
+        p[i] = randprime(k + 1, (3 * (k + 1)) + 1)
 
     random_hash_functions = np.zeros(k)
     for row in range(n_modelwords):
@@ -102,6 +99,8 @@ def locality_sensitive_hashing(signature_matrix, b, r):
     return potential_pairs_set
 
 
+# Additional method to find candidate pairs based on matching values of the most occurring keys.
+# This method is not used in my research.
 def find_pairs_keyvalues(dataframe, most_frequent_keys, similarity_threshold):
     potential_pairs = []
 
@@ -135,18 +134,20 @@ def create_dissimilarity_matrix(dataframe, potential_pairs, k, most_frequent_key
         product1 = pair[0]
         product2 = pair[1]
 
-        shingles1 = get_k_shingles(dataframe['title'][product1], k)
-        shingles2 = get_k_shingles(dataframe['title'][product2], k)
+        shingles1 = get_k_shingles(dataframe['title'][product1], k)     # Derive k-shingles in title of product 1.
+        shingles2 = get_k_shingles(dataframe['title'][product2], k)     # Derive k-shingles in title of product 2.
 
-        # for i in range(len(most_frequent_keys)):
-        #     if dataframe[most_frequent_keys[i]][product1] is not None:
-        #         shingles1.extend(get_k_shingles(dataframe[most_frequent_keys[i]][product1], k))
-        #     if dataframe[most_frequent_keys[i]][product2] is not None:
-        #         shingles2.extend(get_k_shingles(dataframe[most_frequent_keys[i]][product2], k))
+        for i in range(len(most_frequent_keys)):
+            if dataframe[most_frequent_keys[i]][product1] is not None:
+                # Derive k-shingles in key-value pairs of product 1.
+                shingles1.extend(get_k_shingles(dataframe[most_frequent_keys[i]][product1], k))
+            if dataframe[most_frequent_keys[i]][product2] is not None:
+                # Derive k-shingles in key-value pairs of product 2.
+                shingles2.extend(get_k_shingles(dataframe[most_frequent_keys[i]][product2], k))
 
         set_shingles1 = set(shingles1)
         set_shingles2 = set(shingles2)
-        similarity = jaccard_similarity(set_shingles1, set_shingles2)
+        similarity = jaccard_similarity(set_shingles1, set_shingles2)       # Compute Jaccard similarity between the two products.
         dissimilarity_matrix[product1, product2] = 1 - similarity
 
         if dataframe['shop'][product1] == dataframe['shop'][product2]:
@@ -154,11 +155,6 @@ def create_dissimilarity_matrix(dataframe, potential_pairs, k, most_frequent_key
 
         if dataframe['brand'][product1] is not None and dataframe['brand'][product2] is not None and dataframe['brand'][product1] != dataframe['brand'][product2]:
             dissimilarity_matrix[product1, product2] = 100
-
-        # for i in range(len(most_frequent_keys)):
-        #     if dataframe[most_frequent_keys[i]][product1] is not None and dataframe[most_frequent_keys[i]][product2] is not None:
-        #         if dataframe[most_frequent_keys[i]][product1] != dataframe[most_frequent_keys[i]][product2]:
-        #             dissimilarity_matrix[product1, product2] = 100
 
         dissimilarity_matrix[product2, product1] = dissimilarity_matrix[product1, product2]
 
@@ -185,27 +181,3 @@ def clustering(dissimilarity_matrix, threshold):
     potential_pairs_set = set(potential_pairs)
 
     return potential_pairs_set
-
-
-if __name__ == "__main__":
-    data, dataframe = get_data()
-    most_frequent_keys, keyvalues_dataframe = find_most_common_keyvalues(data, 0)
-    dataframe = clean_data(dataframe, keyvalues_dataframe, most_frequent_keys)
-    binary_vector_representations = create_binary_vector_representations(dataframe, False, most_frequent_keys)
-    signature_matrix = min_hashing(0.5, binary_vector_representations)
-    n = len(signature_matrix)
-    pairs_lsh = locality_sensitive_hashing(signature_matrix, 1, n)
-    print(len(pairs_lsh))
-    dissimilarity_matrix = create_dissimilarity_matrix(dataframe, pairs_lsh, 4)
-    pairs_clustering = clustering(dissimilarity_matrix, 1)
-
-    print(dissimilarity_matrix)
-    print(pairs_clustering)
-
-
-
-
-
-
-
-

@@ -72,16 +72,9 @@ def clean_data(dataframe, keyvalues_dataframe, most_frequent_keys):
 
     inch_list = ["inches", "\"", " inch", "'", "''", "”"]
     hertz_list = ["hertz", " hz"]
-    # class_list = [" class"]
-    # diag_list = [" diagonal", " diag"]
     site_list = ["amazon.com", "bestbuy.com", "best buy", "newegg.com", "thenerds.net"]
 
-    # clean_dataframe_copy = clean_dataframe.copy()
-    # clean_dataframe_copy['modelID'] = clean_dataframe_copy['modelID'].str.lower()
-    # for i in range(len(clean_dataframe_copy)):
-    #     clean_dataframe_copy['modelID'][i] = re.sub("[^a-zA-Z0-9\s\.]", "", clean_dataframe_copy['modelID'][i])
-
-    clean_dataframe['title'] = clean_dataframe['title'].str.lower()     # remove capital letters
+    clean_dataframe['title'] = clean_dataframe['title'].str.lower()     # Remove capital letters.
     for i in range(len(clean_dataframe)):
         clean_dataframe['title'][i] = re.sub("[^a-zA-Z0-9\s\.]", "", clean_dataframe['title'][i])
 
@@ -94,29 +87,17 @@ def clean_data(dataframe, keyvalues_dataframe, most_frequent_keys):
         for site in site_list:
             clean_dataframe['title'][i] = clean_dataframe['title'][i].replace(site, "")
 
-        # for class_element in class_list:
-        #     clean_dataframe['title'][i] = clean_dataframe['title'][i].replace(class_element, "class")
-        #
-        # for diag in diag_list:
-        #     clean_dataframe['title'][i] = clean_dataframe['title'][i].replace(diag, "diag.")
+    clean_dataframe['title'] = clean_dataframe['title'].str.strip()     # Remove redundant white space.
 
-        # clean_dataframe['title'][i] = clean_dataframe['title'][i].replace(clean_dataframe_copy['modelID'][i], "")
-
-    clean_dataframe['title'] = clean_dataframe['title'].str.strip()
-
-    clean_dataframe['brand'] = clean_dataframe['brand'].str.lower()     # remove capital letters
-    clean_dataframe['shop'] = clean_dataframe['shop'].str.lower()   # remove capital letters
+    clean_dataframe['brand'] = clean_dataframe['brand'].str.lower()     # Remove capital letters.
+    clean_dataframe['shop'] = clean_dataframe['shop'].str.lower()       # Remove capital letters.
 
     for i in range(len(most_frequent_keys)):
         clean_dataframe[most_frequent_keys[i]] = clean_dataframe[most_frequent_keys[i]].str.lower()
-        # clean_dataframe[most_frequent_keys[i]] = clean_dataframe[most_frequent_keys[i]].str.strip()
         for j in range(len(clean_dataframe)):
             if clean_dataframe[most_frequent_keys[i]][j] is not None:
+                # Remove special characters except ., -, and :.
                 clean_dataframe[most_frequent_keys[i]][j] = re.sub("[^a-zA-Z0-9\.\-\:]", " ", clean_dataframe[most_frequent_keys[i]][j])
-                # if re.match("^(?=.*[a-zA-Z0-9\.\-\:])(?=.*[\d])[a-zA-Z0-9\.\-\:\d]+$", clean_dataframe[most_frequent_keys[i]][j]):
-                #     clean_dataframe[most_frequent_keys[i]][j] = re.sub("[a-zA-Z]", " ", clean_dataframe[most_frequent_keys[i]][j])
-
-                # clean_dataframe[most_frequent_keys[i]][j] = re.sub(" +", " ", clean_dataframe[most_frequent_keys[i]][j])
 
     return clean_dataframe
 
@@ -170,15 +151,3 @@ def count_duplicates(dataframe):
 
     return number_of_duplicates
 
-
-if __name__ == "__main__":
-    data, dataframe = get_data()
-    # print(dataframe)
-    most_common_values, keyvalues_dataframe = find_most_common_keyvalues(data, 20)
-    clean_dataframe = clean_data(dataframe, keyvalues_dataframe, most_common_values)
-
-    print(count_duplicates(clean_dataframe))
-    # print(clean_dataframe)
-    # print(data)
-    # print(len(data))
-    print(count_products(data))
