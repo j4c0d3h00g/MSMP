@@ -1,4 +1,4 @@
-# Duplicate Detection
+# Multi-component Similarity Method with Pre-selection+
 This repository contains the implementation of the Multi-component Similarity Method with Pre-selection+ (MSMP+). In this implementation of the MSMP+ algorithm it is possible to adjust the amount of information from the key-value pairs that is added in the product description. 
 
 ## Data
