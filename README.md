@@ -7,7 +7,7 @@ The data is contained in the file `TVs-all-merged.json`. This dataset consists o
 ## Files
 This repository contains the following Python files:
 - `data_preprocessing.py`: Contains methods to retrieve and clean the data. In this file, also other functional methods for e.g. finding model words and creating shingles of size k are included. 
-- `functions.py`: Contains the functionality of the MSMP+ algorithm. This file consists of the methods that create binary vector representations for the products, apply Locality Sensitive Hashing (LSH), and perform the Multi-component Similarity Method (MSM).
+- `functions.py`: Contains the functionality of the MSMP+ algorithm. This file consists of the methods that create binary vector representations for the products, perform Locality Sensitive Hashing (LSH), and apply a more general form of the Multi-component Similarity Method (MSM).
 - `performance_evaluation.py`: Contains a method to derive the performance evaluation measures and a method to derive the optimal threshold for the adapted hierarchical single linkage clustering that is part of MSM.
 - `bootstrapping.py`: Performs bootstrapping in order to consistently evaluate the performance of MSMP+ for various amounts of added information from the key-value pairs.
 - `plots.py`: Plots the average performance measures across the number of bootstraps against the fraction of comparisons made.
