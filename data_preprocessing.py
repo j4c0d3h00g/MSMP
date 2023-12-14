@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def get_data():
-    url = 'https://raw.githubusercontent.com/j4c0d3h00g/MSMP/main/TVs-all-merged.json?token=GHSAT0AAAAAACH4VULC3SIWMJAONZTZSZMQZL2ZPGA'
+    url = 'https://raw.githubusercontent.com/j4c0d3h00g/MSMP/main/TVs-all-merged.json'
 
     f = requests.get(url)
     data = json.loads(f.text)
