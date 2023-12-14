@@ -1,13 +1,14 @@
 import json
 import re
+import requests
 import pandas as pd
 
 
 def get_data():
-    path = 'C:\\prive\\jaco ckv\\Master Econometrics and Management Science\\Blok 2\\Computer Science\\Assignment\\TVs-all-merged\\TVs-all-merged.json'
+    url = 'https://raw.githubusercontent.com/j4c0d3h00g/MSMP/main/TVs-all-merged.json?token=GHSAT0AAAAAACH4VULC3SIWMJAONZTZSZMQZL2ZPGA'
 
-    f = open(path)
-    data = json.load(f)
+    f = requests.get(url)
+    data = json.loads(f.text)
 
     dataframe = []
     for key, values in data.items():
