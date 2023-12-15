@@ -2,7 +2,7 @@
 This repository contains the implementation of the Multi-component Similarity Method with Pre-selection+ (MSMP+). In this implementation of the MSMP+ algorithm it is possible to adjust the amount of information from the key-value pairs that is added in the product description. 
 
 ## Data
-The data is contained in the file `TVs-all-merged.json`. This dataset consists of televisions that are sold by the Web shops www.amazon.com, www.bestbuy.com, www.thenerds.net, and www.newegg.com. This dataset consists of 1629 products, where each product has a title together with additional information that is contained in the key-value pairs.
+The data is contained in the file `TVs-all-merged.json`. This dataset consists of televisions that are sold by the Web shops www.amazon.com, www.bestbuy.com, www.thenerds.net, and www.newegg.com. This dataset consists of 1624 products, where each product has a title together with additional information that is contained in the key-value pairs.
 
 ## Files
 This repository contains the following Python files:
